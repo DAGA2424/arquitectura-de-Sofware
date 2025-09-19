@@ -3,12 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FileCenter — CD Curso Arquitectura de Datos</title>
+  <title>DAGA — CD Curso Arquitectura de Datos</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:#f1f5f9; color:#0b1220; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:#000; color:#f1f5f9; }
 
-    /* Header sticky */
     header {
       position: sticky;
       top: 0;
@@ -32,61 +31,18 @@
     button:hover { opacity: 0.9; }
     button.primary { background:#06b6d4; color:#042027; border:none; font-weight:600; }
 
-    /* Estilos para botones de acciones de archivo */
-    .file-actions a, .file-actions button {
-      padding: 6px 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-      transition: 0.15s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-view {
-      background: #3b82f6;
-      color: white;
-      border: none;
-    }
-    .btn-view:hover { transform: translateY(-1px); }
-
-    .btn-download {
-      background: #10b981;
-      color: white;
-      border: none;
-    }
-    .btn-download:hover { transform: translateY(-1px); }
+    .hidden { display:none !important; }
 
     main { max-width:1100px; margin:22px auto; padding:0 16px; }
+    .panel { background:#1e293b; padding:16px; border-radius:10px; border:1px solid #334155; margin-bottom:20px; color:#f1f5f9; }
 
-    .folder-header {
-      display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;
-    }
-    .folder-info { display:flex; gap:12px; align-items:center; }
-    .folder-badge { padding:8px 12px; border-radius:8px; background:white; border:1px solid #e6edf3; box-shadow:0 2px 6px rgba(2,6,23,0.04); font-weight:600; }
+    h3 { margin-bottom:10px; }
+    h4 { margin:14px 0 6px; color:#38bdf8; }
 
-    .uploader {
-      display:grid; grid-template-columns:1fr 360px; gap:18px;
-    }
-    .panel { background:white; padding:16px; border-radius:10px; border:1px solid #e6edf3; min-height:220px; }
-
-    #dropZone { padding:12px; border-radius:8px; border:1px dashed #dbeafe; background:#fbfdff; margin-bottom:12px; text-align:center; color:#475569; cursor:copy; }
-    #fileList { list-style:none; display:flex; flex-direction:column; gap:10px; margin-top:8px; }
-    .file-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px; border-radius:8px; border:1px solid #eef2f7; background:#f8fafc; }
-    .file-meta { display:flex; gap:12px; align-items:center; }
-    .thumb { width:48px; height:48px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:#eef2ff; color:#0f172a; font-weight:700; }
-
-    #previewArea { width:100%; height:540px; border-radius:10px; border:1px dashed #cbd5e1; display:flex; align-items:center; justify-content:center; background:white; overflow:hidden; }
-    #previewArea iframe, #previewArea img, #previewArea video, #previewArea pre { width:100%; height:100%; border:none; }
-
-    .small { font-size:13px; color:#475569; }
-
-    /* Responsive */
-    @media (max-width:920px) {
-      .uploader { grid-template-columns:1fr; }
-      #previewArea { height:380px; }
-    }
+    .file-item { display:flex; justify-content:space-between; align-items:center; padding:8px; border:1px solid #475569; border-radius:8px; background:#0f172a; color:#e2e8f0; margin-bottom:6px; }
+    .btn-view { background:#3b82f6; color:white; padding:6px 12px; border-radius:8px; text-decoration:none; margin-left:6px; }
+    .btn-download { background:#10b981; color:white; padding:6px 12px; border-radius:8px; text-decoration:none; margin-left:6px; }
+    .btn-delete { background:#ef4444; color:white; padding:6px 12px; border-radius:8px; border:none; margin-left:6px; cursor:pointer; }
   </style>
 </head>
 <body>
@@ -95,71 +51,46 @@
       <div class="logo">DG</div>
       <div>
         <div class="title">DAGA</div>
-        <div class="subtitle">Ver y descargar archivos — CD Curso Arquitectura de Datos</div>
+        <div class="subtitle">CD Curso Arquitectura de Datos</div>
       </div>
     </div>
-
     <div class="controls">
-      <div id="userGreeting" class="small" style="margin-right:6px;">Bienvenido, invitado</div>
+      <div id="userGreeting" class="small">Bienvenido, invitado</div>
       <button id="loginBtn">Login</button>
     </div>
   </header>
 
   <main>
-    <div class="folder-header">
-      <div class="folder-info">
-        <div class="folder-badge" id="folderBadge">📁 CD Curso Arquitectura de Datos</div>
-        <div class="small">Carpeta actual</div>
-      </div>
-      <div style="display:flex; gap:8px;">
-        <button id="newFolderBtn">Nueva carpeta</button>
-        <button id="downloadAllBtn">Descargar todo (ZIP)</button>
-      </div>
+    <!-- Subir archivos (solo DAGA) -->
+    <div id="uploadPanel" class="panel hidden">
+      <h3>Subir archivos</h3>
+      <label for="semana">Selecciona semana:</label>
+      <select id="semana">
+        <option value="Semana 1">Semana 1</option>
+        <option value="Semana 2">Semana 2</option>
+        <option value="Semana 3">Semana 3</option>
+        <option value="Semana 4">Semana 4</option>
+        <option value="Semana 5">Semana 5</option>
+      </select><br><br>
+      <input type="file" id="fileUpload"><br><br>
+      <button onclick="guardar()">Guardar</button>
     </div>
 
-    <div class="uploader">
-      <div class="panel">
-        <p class="small" style="margin-bottom:8px;">Sube archivos a la carpeta <strong id="currentFolderLabel">CD Curso Arquitectura de Datos</strong> (arrastrar y soltar o botón de selección).</p>
-
-        <input id="fileInput" type="file" multiple style="margin-bottom:12px;" />
-        <div id="dropZone">Arrastra archivos aquí</div>
-
-        <h3 style="margin-top:14px;margin-bottom:8px;">Archivos en la carpeta</h3>
-        <ul id="fileList"><!-- Listado dinámico --></ul>
-      </div>
-
-      <div class="panel">
-        <h3 style="margin-bottom:8px;">Vista previa</h3>
-        <div id="previewArea">
-          <div style="text-align:center;color:#94a3b8;">
-            Selecciona un archivo para ver su previsualización
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="file-box" style="margin-top:22px;">
-      <h3>Semana 1 - Mapa</h3>
-      <img src="semana1mapa.png" alt="Mapa Semana 1" style="max-width:280px; border-radius:10px; border:1px solid #ddd; margin-bottom:8px;">
-      <div class="file-actions" style="display:flex; gap:10px;">
-        <a href="semana1mapa.png" target="_blank" class="btn-view">Ver</a>
-        <a href="semana1mapa.png" download class="btn-download">Descargar</a>
-      </div>
+    <!-- Ver y descargar -->
+    <div id="filesPanel" class="panel">
+      <h3>Mis Documentos</h3>
+      <div id="docsContainer"></div>
+      <br>
+      <button onclick="logout()" id="logoutBtn" class="hidden">Cerrar Sesión</button>
     </div>
   </main>
 
-  <!-- Modal Login (simulado) -->
+  <!-- Modal login -->
   <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.6);align-items:center;justify-content:center;z-index:1200;">
     <div style="background:white;padding:18px;border-radius:10px;width:320px;box-shadow:0 8px 30px rgba(2,6,23,0.4);">
       <h3>Iniciar sesión</h3>
-      <div style="margin-bottom:10px;">
-        <label>Usuario</label>
-        <input id="username" type="text" placeholder="Nombre de usuario" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;" />
-      </div>
-      <div style="margin-bottom:10px;">
-        <label>Contraseña</label>
-        <input id="password" type="password" placeholder="Contraseña" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;" />
-      </div>
+      <input id="username" type="text" placeholder="Usuario" style="width:100%;margin-bottom:10px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;" />
+      <input id="password" type="password" placeholder="Contraseña" style="width:100%;margin-bottom:10px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;" />
       <div style="display:flex;gap:8px;justify-content:flex-end;">
         <button id="closeModal">Cancelar</button>
         <button id="doLogin" class="primary">Entrar</button>
@@ -167,264 +98,124 @@
     </div>
   </div>
 
-  <!-- JSZip CDN (para crear ZIP en el navegador). Si no carga, el sistema usará fallback -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+  const loginBtn = document.getElementById("loginBtn");
+  const modal = document.getElementById("modal");
+  const closeModal = document.getElementById("closeModal");
+  const doLogin = document.getElementById("doLogin");
+  const uploadPanel = document.getElementById("uploadPanel");
+  const docsContainer = document.getElementById("docsContainer");
+  const userGreeting = document.getElementById("userGreeting");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-  <script>
-    // --- Estado de carpetas y archivos ---
-    const state = {
-      currentFolder: 'CD Curso Arquitectura de Datos',
-      folders: {
-        'CD Curso Arquitectura de Datos': [] // objetos {id,name,size,type,file,url}
-      }
-    };
+  // 📂 Documentos predeterminados
+  const defaultDocs = {
+    "Semana 1": ["semana1mapa.pdf", "guia_teoria1.pdf"],
+    "Semana 2": ["TRABAJO1_SEMANA2_CARLOS.pdf"],
+    "Semana 3": ["documento2.png"],
+    "Semana 4": ["resumen_final.pdf"]
+  };
 
-    // ---- Elementos ----
-    const fileInput = document.getElementById('fileInput');
-    const dropZone = document.getElementById('dropZone');
-    const fileList = document.getElementById('fileList');
-    const previewArea = document.getElementById('previewArea');
-    const loginBtn = document.getElementById('loginBtn');
-    const modal = document.getElementById('modal');
-    const closeModal = document.getElementById('closeModal');
-    const doLogin = document.getElementById('doLogin');
-    const userGreeting = document.getElementById('userGreeting');
-    const newFolderBtn = document.getElementById('newFolderBtn');
-    const downloadAllBtn = document.getElementById('downloadAllBtn');
-    const folderBadge = document.getElementById('folderBadge');
-    const currentFolderLabel = document.getElementById('currentFolderLabel');
+  // Inicializar docs si no existen
+  if (!localStorage.getItem("docs")) {
+    localStorage.setItem("docs", JSON.stringify(defaultDocs));
+  }
 
-    // para saber qué archivo está en preview (id)
-    let currentPreviewId = null;
+  loginBtn.onclick = ()=> modal.style.display="flex";
+  closeModal.onclick = ()=> modal.style.display="none";
 
-    // --- Login ---
-    loginBtn.addEventListener('click', ()=> modal.style.display = 'flex');
-    closeModal.addEventListener('click', ()=> modal.style.display = 'none');
-    doLogin.addEventListener('click', ()=> {
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value.trim();
-      if (!user || !pass) {
-        alert('Por favor, ingresa usuario y contraseña.');
-        return;
-      }
-      userGreeting.textContent = 'Bienvenido, ' + user;
-      modal.style.display = 'none';
-      localStorage.setItem('fc_user', user);
-    });
-    const storedUser = localStorage.getItem('fc_user');
-    if (storedUser) userGreeting.textContent = 'Bienvenido, ' + storedUser;
+  doLogin.onclick = ()=> {
+    let user = document.getElementById("username").value.trim();
+    let pass = document.getElementById("password").value.trim();
 
-    // --- Manejo de archivos: drag & drop y file input ---
-    ['dragenter','dragover'].forEach(ev => {
-      dropZone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); dropZone.style.background = '#eef2ff'; dropZone.style.borderColor = '#93c5fd'; });
-    });
-    ['dragleave','drop'].forEach(ev => {
-      dropZone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); dropZone.style.background = ''; dropZone.style.borderColor = ''; });
-    });
-    dropZone.addEventListener('drop', e => {
-      const dt = e.dataTransfer;
-      if (dt && dt.files) handleFiles(dt.files);
-    });
-    fileInput.addEventListener('change', e => { handleFiles(e.target.files); fileInput.value=''; });
-
-    function handleFiles(fileListObj) {
-      const arr = Array.from(fileListObj);
-      arr.forEach(f => {
-        const id = 'f-' + Math.random().toString(36).slice(2,10);
-        const entry = { id, name: f.name, size: f.size, type: f.type, file: f, url: URL.createObjectURL(f) };
-        state.folders[state.currentFolder].push(entry);
-      });
-      renderFileList();
+    if(user === "DAGA" && pass === "74128745"){
+      modal.style.display="none";
+      localStorage.setItem("logged", "DAGA");
+      userGreeting.textContent = "Bienvenido, " + user;
+      uploadPanel.classList.remove("hidden");
+      logoutBtn.classList.remove("hidden");
+      mostrarArchivos();
+    } else {
+      alert("Usuario o contraseña incorrectos");
     }
+  };
 
-    // --- Render lista de archivos ---
-    function renderFileList() {
-      const list = state.folders[state.currentFolder] || [];
-      fileList.innerHTML = '';
-      currentFolderLabel.textContent = state.currentFolder;
-      folderBadge.textContent = '📁 ' + state.currentFolder;
+  function guardar() {
+    let semana = document.getElementById("semana").value;
+    let file = document.getElementById("fileUpload").files[0];
 
-      if (list.length === 0) {
-        fileList.innerHTML = '<li class="small" style="padding:8px;color:#64748b">La carpeta está vacía</li>';
-        previewArea.innerHTML = '<div style="text-align:center;color:#94a3b8;">Selecciona un archivo para ver su previsualización</div>';
-        currentPreviewId = null;
-        return;
-      }
+    if (file) {
+      let docs = JSON.parse(localStorage.getItem("docs")) || {};
+      if (!docs[semana]) docs[semana] = [];
+      docs[semana].push(file.name);
+      localStorage.setItem("docs", JSON.stringify(docs));
+      mostrarArchivos();
+    } else {
+      alert("Selecciona un archivo");
+    }
+  }
 
-      list.forEach(entry => {
-        const li = document.createElement('li');
-        li.className = 'file-item';
-        li.innerHTML = `
-          <div class="file-meta">
-            <div class="thumb">${iconForType(entry.type, entry.name)}</div>
-            <div>
-              <div style="font-weight:600">${entry.name}</div>
-              <div class="small">${formatBytes(entry.size)} • ${entry.type || 'Desconocido'}</div>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <button data-id="${entry.id}" class="btn-view viewBtn">Ver</button>
-            <a class="btn-download" href="${entry.url}" download="${entry.name}">Descargar</a>
-            <button data-id="${entry.id}" class="removeBtn">Eliminar</button>
+  function eliminar(semana, index){
+    let docs = JSON.parse(localStorage.getItem("docs"));
+    docs[semana].splice(index,1);
+    localStorage.setItem("docs", JSON.stringify(docs));
+    mostrarArchivos();
+  }
+
+  function mostrarArchivos() {
+    let docs = JSON.parse(localStorage.getItem("docs")) || {};
+    docsContainer.innerHTML = "";
+    const logged = localStorage.getItem("logged");
+
+    // Ordenar semanas en orden ascendente
+    let semanasOrdenadas = Object.keys(docs).sort((a, b) => {
+      let numA = parseInt(a.replace("Semana ", "")) || 0;
+      let numB = parseInt(b.replace("Semana ", "")) || 0;
+      return numA - numB;
+    });
+
+    for (let semana of semanasOrdenadas) {
+      let h4 = document.createElement("h4");
+      h4.textContent = semana;
+      docsContainer.appendChild(h4);
+
+      docs[semana].forEach((f, i) => {
+        let div = document.createElement("div");
+        div.className="file-item";
+        div.innerHTML = `
+          ${f}
+          <div>
+            <a href="${f}" target="_blank" class="btn-view">Ver</a>
+            <a href="${f}" download class="btn-download">Descargar</a>
+            ${logged==="DAGA" ? `<button class="btn-delete" onclick="eliminar('${semana}',${i})">Eliminar</button>` : ""}
           </div>
         `;
-        fileList.appendChild(li);
+        docsContainer.appendChild(div);
       });
-
-      // listeners
-      fileList.querySelectorAll('.viewBtn').forEach(b => b.addEventListener('click', e => {
-        const id = e.currentTarget.dataset.id;
-        const file = state.folders[state.currentFolder].find(x=>x.id===id);
-        if (file) showPreview(file);
-      }));
-      fileList.querySelectorAll('.removeBtn').forEach(b => b.addEventListener('click', e => {
-        const id = e.currentTarget.dataset.id;
-        removeFileById(id);
-      }));
     }
+  }
 
-    // --- Mostrar preview (mejor detección si type vacío) ---
-    function showPreview(entry) {
-      previewArea.innerHTML = '';
-      currentPreviewId = entry.id;
-      const t = (entry.type || '').toLowerCase();
-      const name = entry.name || '';
+  function logout() {
+    localStorage.removeItem("logged");
+    uploadPanel.classList.add("hidden");
+    logoutBtn.classList.add("hidden");
+    userGreeting.textContent = "Bienvenido, invitado";
+    mostrarArchivos();
+  }
 
-      const isPdf = t === 'application/pdf' || /\.pdf$/i.test(name);
-      const isImage = t.startsWith('image/') || name.match(/\.(jpe?g|png|gif|webp|bmp|svg)$/i);
-      const isVideo = t.startsWith('video/') || name.match(/\.(mp4|webm|ogg|mov)$/i);
-      const isText = t.startsWith('text/') || name.match(/\.(txt|csv|md|log|json|xml)$/i);
-
-      if (isImage) {
-        const img = document.createElement('img');
-        img.src = entry.url; img.alt = entry.name; img.style.objectFit = 'contain';
-        previewArea.appendChild(img);
-      } else if (isPdf) {
-        const iframe = document.createElement('iframe');
-        iframe.src = entry.url;
-        iframe.style.border = 'none';
-        previewArea.appendChild(iframe);
-      } else if (isVideo) {
-        const vid = document.createElement('video');
-        vid.controls = true; vid.src = entry.url;
-        vid.style.maxWidth = '100%';
-        previewArea.appendChild(vid);
-      } else if (isText) {
-        const pre = document.createElement('pre');
-        pre.style.whiteSpace='pre-wrap'; pre.style.padding='12px'; pre.style.overflow='auto';
-        const reader = new FileReader();
-        reader.onload = ()=> pre.textContent = reader.result;
-        reader.onerror = ()=> pre.textContent = 'Error leyendo el archivo.';
-        reader.readAsText(entry.file);
-        previewArea.appendChild(pre);
-      } else {
-        const box = document.createElement('div'); box.style.textAlign='center';
-        box.innerHTML = `<p class="small">No se puede previsualizar este tipo de archivo en el navegador.</p>
-                         <p style="margin-top:8px;"><strong>${entry.name}</strong></p>
-                         <a href="${entry.url}" download="${entry.name}"><button class="primary">Descargar archivo</button></a>`;
-        previewArea.appendChild(box);
-      }
+  // Siempre que cargue: mostrar documentos ya existentes como invitado
+  window.onload = ()=> {
+    const logged = localStorage.getItem("logged");
+    if (logged === "DAGA") {
+      userGreeting.textContent = "Bienvenido, DAGA";
+      uploadPanel.classList.remove("hidden");
+      logoutBtn.classList.remove("hidden");
+    } else {
+      userGreeting.textContent = "Bienvenido, invitado";
     }
-
-    // --- Eliminar archivo por id ---
-    function removeFileById(id) {
-      const arr = state.folders[state.currentFolder];
-      const idx = arr.findIndex(f=>f.id===id);
-      if (idx>=0) {
-        try { URL.revokeObjectURL(arr[idx].url); } catch(e){}
-        const removed = arr.splice(idx,1)[0];
-        // si era el que estaba en vista previa, limpiar preview
-        if (currentPreviewId === id) {
-          previewArea.innerHTML = '<div style="text-align:center;color:#94a3b8;">Selecciona un archivo para ver su previsualización</div>';
-          currentPreviewId = null;
-        }
-        renderFileList();
-      }
-    }
-
-    // --- Helpers ---
-    function formatBytes(bytes, decimals=1){
-      if (bytes===0) return '0 B';
-      const k = 1024; const dm = decimals<0?0:decimals;
-      const sizes = ['B','KB','MB','GB','TB'];
-      const i = Math.floor(Math.log(bytes)/Math.log(k));
-      return parseFloat((bytes/Math.pow(k,i)).toFixed(dm)) + ' ' + sizes[i];
-    }
-    function iconForType(type, name){
-      if (!type) {
-        if (name.match(/\.(pdf)$/i)) return 'PDF';
-        return 'F';
-      }
-      if (type.startsWith('image/')) return 'IMG';
-      if (type === 'application/pdf') return 'PDF';
-      if (type.startsWith('video/')) return 'VID';
-      if (type.startsWith('text/')) return 'TXT';
-      return 'F';
-    }
-
-    // --- Crear carpeta ---
-    newFolderBtn.addEventListener('click', ()=> {
-      const name = prompt('Nombre de la nueva carpeta:','Nueva Carpeta');
-      if (!name) return;
-      if (state.folders[name]) { alert('La carpeta ya existe.'); return; }
-      state.folders[name] = [];
-      state.currentFolder = name;
-      folderBadge.textContent = '📁 ' + name;
-      currentFolderLabel.textContent = name;
-      renderFileList();
-      alert('Carpeta creada: ' + name + '\nAhora estás en esa carpeta.');
-    });
-
-    // --- Descargar todo (ZIP con JSZip si está disponible) ---
-    downloadAllBtn.addEventListener('click', async ()=> {
-      const list = state.folders[state.currentFolder] || [];
-      if (list.length === 0) return alert('No hay archivos para descargar en esta carpeta.');
-      // Si JSZip cargó:
-      if (window.JSZip) {
-        try {
-          const zip = new JSZip();
-          list.forEach(f => zip.file(f.name, f.file));
-          const blob = await zip.generateAsync({type:'blob'});
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          a.href = url;
-          a.download = `${state.currentFolder}.zip`;
-          a.click();
-          a.remove();
-          URL.revokeObjectURL(url);
-        } catch (err) {
-          console.error('Error creando zip:', err);
-          alert('No se pudo crear el ZIP. Se descargará una lista de archivos en su lugar.');
-          downloadListFallback();
-        }
-      } else {
-        // fallback simple (lista .txt)
-        downloadListFallback();
-      }
-    });
-
-    function downloadListFallback() {
-      const list = state.folders[state.currentFolder] || [];
-      const txt = list.map(f => f.name).join('\n');
-      const blob = new Blob([txt], {type:'text/plain'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      document.body.appendChild(a);
-      a.href = url;
-      a.download = `${state.currentFolder}-lista-archivos.txt`;
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    // limpiar objectURLs antes de cerrar
-    window.addEventListener('beforeunload', ()=> {
-      Object.values(state.folders).flat().forEach(f=>{ try{ URL.revokeObjectURL(f.url);}catch(e){} });
-    });
-
-    // Inicial
-    renderFileList();
-  </script>
+    mostrarArchivos();
+  };
+</script>
 </body>
 </html>
+
